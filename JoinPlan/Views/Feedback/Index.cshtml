@@ -1,0 +1,62 @@
+﻿@model IEnumerable<JoinPlan.Models.Feedback>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@*<p>
+    @Html.ActionLink("Create New", "Create")
+</p>*@
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.MemberEmail)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Subject)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Body)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FeedbackDateTime)
+        </th>
+        <th>
+            Read?
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.MemberEmail)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Subject)
+        </td>
+        <td>
+            <p style="width:250px;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">@item.Body</p>
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FeedbackDateTime)
+        </td>
+        <td>
+            @if (item.Read)
+            {
+                <i class="fa fa-check" aria-hidden="true" style="color:green"></i>
+            }
+            else
+            {
+                <i class="fa fa-times" aria-hidden="true" style="color:red"></i>
+            }
+        </td>
+        <td>
+            @Html.ActionLink("View", "Edit", new { id = item.FeedbackID })
+        </td>
+    </tr>
+}
+
+</table>

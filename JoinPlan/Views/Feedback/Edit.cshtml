@@ -1,0 +1,68 @@
+﻿@model JoinPlan.Models.Feedback
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Feedback</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.FeedbackID)
+    @Html.HiddenFor(model => model.MemberEmail)
+    @Html.HiddenFor(model => model.Subject)
+    @Html.HiddenFor(model => model.Body)
+    @Html.HiddenFor(model => model.FeedbackDateTime)
+    @Html.HiddenFor(model => model.Read)
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.MemberEmail, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <a href="mailto:@Model.MemberEmail">@Model.MemberEmail</a>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.Subject, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <p>@Model.Subject</p>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.Body, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <p>@Model.Body</p>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.FeedbackDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <p>@Model.FeedbackDateTime</p>
+        </div>
+    </div>
+
+    @if (!Model.Read)
+    {
+        <div class="form-group row">
+            <div class="col-lg-12 d-flex justify-content-end">
+                <input type="submit" value="Mark as Read" class="btn btn-primary" />
+            </div>
+        </div>
+    }
+
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

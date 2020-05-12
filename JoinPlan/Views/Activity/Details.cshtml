@@ -1,0 +1,187 @@
+﻿@model JoinPlan.Models.Activity
+
+@{
+    ViewBag.Title = "Details";
+    ViewBag.ParticipationID = -1;
+}
+
+<h3>@Model.Name</h3>
+@if (Request.IsAuthenticated && !User.IsInRole("admin"))
+{
+    if (DateTime.Now < Model.ActivityDateTime)
+    {
+        if (Model.Participations.ToList().FindIndex(p => p.ParticipantEmail == User.Identity.Name) < 0)
+        {
+            <button class="btn btn-primary" id="joinButton">Join Now</button>
+        }
+        else
+        {     
+           <button class="btn btn-danger" id="withdrawButton">Cancel Participation</button>
+        }
+    }
+    else
+    {
+        <p>This activity is already passed</p>
+    }
+}
+<hr />
+<div class="row">
+    <div class="col-lg-6">
+        <h4>Activity Info</h4>
+        <hr />
+        <img class="img-fluid" src="@Model.ImageUrl" style="max-height:200px" />
+        <div style="margin-top:1rem">
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>@Html.DisplayNameFor(model => model.ActivityDateTime)</strong>
+                </div>
+                <div class="col-md-8">
+                    @Html.DisplayFor(model => model.ActivityDateTime)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>@Html.DisplayNameFor(model => model.Description)</strong>
+                </div>
+                <div class="col-md-8 text-justify">
+                    @Html.DisplayFor(model => model.Description)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>@Html.DisplayNameFor(model => model.Name)</strong>
+                </div>
+                <div class="col-md-8">
+                    @Html.DisplayFor(model => model.Name)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>@Html.DisplayNameFor(model => model.OrganizerEmail)</strong>
+                </div>
+                <div class="col-md-8">
+                    <a href="mailto:@Model.OrganizerEmail">@Html.DisplayFor(model => model.OrganizerEmail)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div>
+            <h4>Updates</h4>
+            <hr />
+            <div style="margin-bottom:2rem; max-height:170px;overflow-y:auto">
+
+                @if (Model.ActivityUpdates.Count == 0)
+                {
+                    <p>No updates on activity</p>
+                }
+                else
+                {
+                    foreach (var update in Model.ActivityUpdates.Reverse())
+                    {
+                        <div>
+                            <h5>@update.Body</h5>
+                        </div>
+                        <div>
+                            <i>Published at @update.PublishedDateTime</i>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div>
+            <h4>Participants ( @Model.Participations.Count/ @Model.MaxParticipant ) </h4>
+            <hr />
+            <div style="margin-bottom:2rem; max-height:170px;overflow-y:auto">
+
+                @if (Model.Participations.Count == 0)
+                {
+                    <p>No participant registered</p>
+                }
+                else
+                {
+                    foreach (var participation in Model.Participations)
+                    {
+                        <div>
+                            <b>@participation.ParticipantEmail</b>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<p>
+    <a href="@Url.Action("Activities","Home")">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        Back to Activities
+    </a>
+</p>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryajax")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
+
+    <script type="text/javascript">
+
+        $("#joinButton").click(function () {
+
+            var ActivityId = @Model.ActivityID;
+            var ParticipantEmail = "@User.Identity.Name";
+            var confirmJoining = confirm('Confirm joining @Model.Name?');
+            if (confirmJoining) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/Participations',
+                    data: {
+                        ActivityId: ActivityId,
+                        ParticipantEmail: ParticipantEmail,
+                    },
+                    success: function (result) {
+                        if (result.Success) {
+                            alert('Successfully joined @Model.Name.');
+                            setTimeout(function () { location.reload() }, 500);
+                        }
+
+                    },
+                });
+            }
+        });
+
+        $("#withdrawButton").click(function () {
+            var id = -1;
+            @{
+                Func<int, string, int> getParticipantId = (activityId, participantEmail) =>
+                {
+                    var participants = Model.Participations.Where(p => p.ParticipantEmail == participantEmail && p.ActivityID == Model.ActivityID).ToList();
+                    if (participants.Count == 0) return -1;
+                    else
+                    {
+                        return participants[0].ParticipationID;
+                    }
+                };
+
+                ViewBag.ParticipationID = getParticipantId(Model.ActivityID, User.Identity.Name);
+            }
+            id = @ViewBag.ParticipationID;
+            var confirmCancel = confirm('Confirm withdrawing from @Model.Name?');
+            if (confirmCancel) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/Participations/' + id,
+                    success: function (result) {
+                        if (result.Success) {
+                            alert('Successfully withdraw from @Model.Name.');
+                            setTimeout(function () { location.reload() }, 500);
+                        }
+
+                    },
+                });
+            }
+        });
+    </script>
+}

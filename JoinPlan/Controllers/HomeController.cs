@@ -26,5 +26,12 @@ namespace JoinPlan.Controllers
 
             return View();
         }
+
+        public ActionResult Activities()
+        {
+            ViewBag.Message = "Your activities page.";
+
+            return View();
+        }
     }
 }

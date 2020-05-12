@@ -7,6 +7,7 @@
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    padding-top: 1.5rem;
 }
 
 /* Override the default bootstrap behavior where horizontal description lists 
@@ -17,8 +18,83 @@
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
-input,
+/*input,
 select,
 textarea {
     max-width: 280px;
+}*/
+
+.date-picker-custom {
+    line-height: 1.4285 !important;
+}
+
+.social-media-icon {
+    width: 80px;
+    height: 80px;
+    margin-right: 14px; 
+    border-radius: 10px;
+}
+
+.social-media-icon:hover {
+    transform: scale(1.05);
+    cursor:pointer;
+}
+
+/*https://www.w3schools.com/howto/howto_js_filter_dropdown.asp */
+.dropbtn {
+    background-color: darkslateblue;
+    color: white;
+    padding: 8px 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+    background-color: darkslateblue;
+}
+
+#myInput {
+    box-sizing: border-box;
+    /*background-image: url('searchicon.png');*/
+    background-position: 14px 12px;
+    background-repeat: no-repeat;
+    font-size: 16px;
+    padding: 14px 20px 12px 45px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+}
+
+    #myInput:focus {
+        outline: 3px solid #ddd;
+    }
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f6f6f6;
+    min-width: 230px;
+    overflow: auto;
+    border: 1px solid #ddd;
+    z-index: 1;
+}
+
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+.dropdown a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: block;
 }

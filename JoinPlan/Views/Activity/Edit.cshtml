@@ -1,0 +1,225 @@
+﻿@model JoinPlan.Models.Activity
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+
+<h3>Editing @Model.Name</h3>
+
+<div class="row">
+    <div class="col-lg-6">
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <h4>Activity Info</h4>
+            <div class="form-horizontal">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.ActivityID)
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        <textarea name="Description" id="Description" class="form-control" rows="4" style="resize:none;">@Model.Description</textarea>
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.ImageUrl, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ImageUrl, "", new { @class = "text-danger" })
+                        <div style="margin-top:18px;margin-bottom:18px">
+                            <img id="img-preview" src="@Model.ImageUrl" style="max-width:100%; max-height:200px;" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.OrganizerEmail, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.OrganizerEmail, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.OrganizerEmail, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.ActivityDateTime, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        <div class="input-group date datetimepicker">
+                            @Html.EditorFor(model => model.ActivityDateTime, new { htmlAttributes = new { @class = "form-control datetimepicker" } })
+                            <span class="input-group-append">
+                                <span class="input-group-text">
+                                    <i class="fa fa-calendar" style="width:14px"></i>
+                                </span>
+                            </span>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.ActivityDateTime, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.MaxParticipant, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.MaxParticipant, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.MaxParticipant, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-12 d-flex justify-content-end">
+                        <input type="submit" value="Save Edits" class="btn btn-primary" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-lg-6">
+        <div>
+            <h4>Updates</h4>
+            <hr />
+            <div style="margin-bottom:2rem; max-height:170px;overflow-y:auto">
+
+                @if (Model.ActivityUpdates.Count == 0)
+                {
+                    <p>No updates on activity</p>
+                }
+                else
+                {
+                    foreach (var update in Model.ActivityUpdates.Reverse())
+                    {
+                        <div>
+                            <h5>@update.Body</h5>
+                        </div>
+                        <div>
+                            <i>Published at @update.PublishedDateTime</i>
+                        </div>
+                    }
+                }
+            </div>
+
+            <form id="newUpdateForm" method="post" action="/api/ActivityUpdates">
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" name="Body" id="Body" placeholder="New activity update..." style="resize:none;max-width:none;"></textarea>
+                </div>
+                <input type="hidden" id="ActivityID" name="ActivityID" value="@Model.ActivityID">
+                <div class="text-right">
+                    <input type="submit" value="Add update" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+        <div>
+            <h4>Participants ( @Model.Participations.Count/ @Model.MaxParticipant ) </h4>
+            <hr />
+            <div style="margin-bottom:2rem; max-height:170px;overflow-y:auto">
+
+                @if (Model.Participations.Count == 0)
+                {
+                    <p>No participant registered</p>
+                }
+                else
+                {
+                    foreach (var participation in Model.Participations)
+                    {
+                        <div>
+                            <h5><b>@participation.ParticipantEmail</b></h5>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div>
+    <a href="@Url.Action("Index")">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        Back to List
+    </a>
+    @*@Html.ActionLink("Back to List", "Index")*@
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryajax")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
+
+    <script type="text/javascript">
+        $(function () {
+
+            //if (window.jQuery().datetimepicker) {
+
+                // Ref: https://eonasdan.github.io/bootstrap-datetimepicker/
+                $('.datetimepicker').datetimepicker({
+                    useCurrent: false,
+                    defaultDate: moment("@Model.ActivityDateTime", "DD/MM/YYYY hh:mm:ss A"),
+                    format: 'DD/MM/YYYY hh:mm:ss A',
+                    icons: {
+                        time: 'fa fa-clock-o',
+                        date: 'fa fa-calendar',
+                        up: 'fa fa-chevron-up',
+                        down: 'fa fa-chevron-down',
+                        previous: 'fa fa-chevron-left',
+                        next: 'fa fa-chevron-right',
+                        today: 'fa fa-check',
+                        clear: 'fa fa-trash',
+                        close: 'fa fa-times'
+                    }
+                });
+            //}
+
+
+            // Ref: https://stackoverflow.com/questions/30510221/how-to-fix-the-field-must-be-a-date-on-a-datetime-property-in-mvc
+            $.validator.methods.date = function (value, element) {
+                return this.optional(element) || moment(value, "DD/MM/YYYY hh:mm:ss A", true).isValid();
+            }
+
+            $('#ImageUrl').change(function () {
+                $('#img-preview').attr("src", $('#ImageUrl').val());
+            });
+        });
+
+        $("#newUpdateForm").submit(function (e) {
+            e.preventDefault();
+
+            var newUpdateText = $("#Body").val();
+            var confirmAdding = confirm('Confirm adding update (update cannot be modified/ deleted)\n\nNew update text:\n' + newUpdateText);
+
+            if (confirmAdding) {
+                 var form = $(this);
+                var url = form.attr('action');
+                //console.log(form.serialize());
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: form.serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            //alert('Successfully added new update for @Model.Name. Refresing page...');
+                            setTimeout(function () { location.reload(true) },500);
+                        }
+
+                    },
+                });
+            }
+        });
+
+    </script>
+}

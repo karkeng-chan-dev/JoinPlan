@@ -79,6 +79,10 @@ namespace JoinPlan.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+                    ApplicationUser currentUser = await UserManager.FindByEmailAsync(model.Email);
+                    currentUser.LastLogin = DateTime.Now;
+                    await UserManager.UpdateAsync(currentUser);
+
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
@@ -151,10 +155,13 @@ namespace JoinPlan.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, DisplayName = model.Name };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    user.LastLogin = DateTime.Now;
+                    await UserManager.UpdateAsync(user);
+                    await UserManager.AddToRoleAsync(user.Id, "member" );
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771

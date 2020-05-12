@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Activities";
+}
+
+@*<h3>@ViewBag.Title</h3>*@
+
+@if (Request.IsAuthenticated)
+{
+    if (User.IsInRole("admin"))
+    {
+        @Html.ActionLink("Manage Activities", "Index", "Activity")
+    }
+}
+<hr />
+@*<h3>@ViewBag.Message</h3>*@
+
+<div class="d-flex justify-content-start" style="margin-bottom:2rem;">
+    <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn"> Search&nbsp;&nbsp;<i class="fa fa-search" aria-hidden="true"></i> </button>
+        <div id="myDropdown" class="dropdown-content">
+            <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+        </div>
+    </div>
+</div>
+
+
+<h4>Upcoming activities</h4>
+<div class="row" id="future-activ-ls">
+    <div class="col-lg-12"><p>Loading activities...</p></div>
+
+</div>
+
+<h4>Past activities</h4>
+<div class="row" id="past-activ-ls">
+    <div class="col-lg-12"><p>Loading activities...</p></div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryajax")
+
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                type: 'GET',
+                url: '/api/Activities',
+                data: { futureDated: true },
+                success: function (result) {
+                    //console.log('Coming activities:');
+                    if (result.length > 0) {
+
+                        $("#future-activ-ls").empty();
+                        //var elemsList = [];
+                        $.each(result, function (i, activity) {
+                            try {
+                                //console.log(activity.Name);
+                                var cardHtml =
+                                    `<div class="col-md-4" style="padding:1rem">
+                                                <div class="card">
+                                                    <div class="card-img-top" style="height:170px">
+                                                        <img style="width:100%; max-height:170px" src="${activity.ImageUrl}" alt="${activity.Name}">
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <h5>${activity.Name}</h5>
+                                                        <i>${moment(activity.ActivityDateTime).format("YYYY-MM-DD hh:mm A")}</i>
+                                                        <p style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">${activity.Description}</p>
+                                                        <p >${activity.Participations.length}/ ${activity.MaxParticipant} participants</p>
+                                                        <a href="/Activity/Details/${activity.ActivityID}" class="btn btn-primary">View details</a>
+                                                    </div>
+                                                </div>
+                                            </div>`
+                                //elemsList.push(cardHtml);
+                                $("#future-activ-ls").append(cardHtml);
+                                $('#myDropdown').append(`<a href="/Activity/Details/${activity.ActivityID}">${activity.Name}</a>`)
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+
+                    } else {
+                        $("#future-activ-ls").append(`<div class="col-lg-12"><p>No future activities.</p></div>`);
+                    }
+                },
+            });
+            $.ajax({
+                type: 'GET',
+                url: '/api/Activities',
+                data: { futureDated: false },
+                success: function (result) {
+                    //console.log('Past activities:');
+                    if (result.length > 0) {
+
+                        $("#past-activ-ls").empty();
+                        //var elemsList = [];
+                        $.each(result, function (i, activity) {
+                            try {
+                                //console.log(activity.Name);
+                                var cardHtml =
+                                    `<div class="col-md-4" style="padding:1rem">
+                                                <div class="card">
+                                                    <div class="card-img-top" style="height:170px">
+                                                        <img style="width:100%; max-height:170px" src="${activity.ImageUrl}" alt="${activity.Name}">
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <h5>${activity.Name}</h5>
+                                                        <i>${moment(activity.ActivityDateTime).format("YYYY-MM-DD hh:mm A")}</i>
+                                                        <p style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">${activity.Description}</p>
+                                                        <p >${activity.Participations.length}/ ${activity.MaxParticipant} participants</p>
+                                                        <a href="/Activity/Details/${activity.ActivityID}" class="btn btn-primary">View details</a>
+                                                    </div>
+                                                </div>
+                                            </div>`
+                                //elemsList.push(cardHtml);
+                                $("#past-activ-ls").append(cardHtml);
+                                $('#myDropdown').append(`<a href="/Activity/Details/${activity.ActivityID}">${activity.Name}</a>`)
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+
+                    } else {
+                        $("#past-activ-ls").append(`<div class="col-lg-12"><p>No past activities.</p></div>`);
+                    }
+                },
+            });
+        });
+
+    </script>
+
+    <script>
+        /* When the user clicks on the button,
+        toggle between hiding and showing the dropdown content */
+        function myFunction() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        function filterFunction() {
+            var input, filter, ul, li, a, i;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            div = document.getElementById("myDropdown");
+            a = div.getElementsByTagName("a");
+            for (i = 0; i < a.length; i++) {
+                txtValue = a[i].textContent || a[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+}

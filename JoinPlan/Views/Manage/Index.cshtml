@@ -1,13 +1,14 @@
 ﻿@model JoinPlan.Models.IndexViewModel
 @{
-    ViewBag.Title = "Manage";
+                /**/
+
+                ViewBag.Title = "My Profile";
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>@ViewBag.Title</h2>
 
 <p class="text-success">@ViewBag.StatusMessage</p>
 <div>
-    <h4>Change your account settings</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>Password:</dt>
@@ -15,7 +16,7 @@
             [
             @if (Model.HasPassword)
             {
-                @Html.ActionLink("Change your password", "ChangePassword")
+                @Html.ActionLink("Change my password", "ChangePassword")
             }
             else
             {
@@ -23,21 +24,21 @@
             }
             ]
         </dd>
-        <dt>External Logins:</dt>
-        <dd>
-            @Model.Logins.Count [
-            @Html.ActionLink("Manage", "ManageLogins") ]
-        </dd>
+        @*<dt>External Logins:</dt>
+            <dd>
+                @Model.Logins.Count [
+                @Html.ActionLink("Manage", "ManageLogins") ]
+            </dd>*@
         @*
             Phone Numbers can used as a second factor of verification in a two-factor authentication system.
-             
+
              See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
                 for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-             
+
              Uncomment the following block after you have set up two-factor authentication
         *@
-        @*  
-            <dt>Phone Number:</dt>
+        @* Disabled due to no SMS services connected *@
+        @*<dt>Phone Number:</dt>
             <dd>
                 @(Model.PhoneNumber ?? "None")
                 @if (Model.PhoneNumber != null)
@@ -47,41 +48,105 @@
                     using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                     {
                         @Html.AntiForgeryToken()
-                        <text>[<input type="submit" value="Remove" class="btn-link" />]</text>
+                        <text>[&nbsp;&nbsp;<input type="submit" value="Remove" class="btn-link" />&nbsp;&nbsp;]</text>
                     }
                 }
                 else
                 {
-                    <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
+                    <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")&nbsp;&nbsp;]</text>
                 }
-            </dd>
-        *@
-        <dt>Two-Factor Authentication:</dt>
-        <dd>
-            <p>
-                There are no two-factor authentication providers configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                for details on setting up this ASP.NET application to support two-factor authentication.
-            </p>
-            @*@if (Model.TwoFactor)
+            </dd>*@
+
+        @*<dt>Two-Factor Authentication:</dt>
+            <dd>
+                <p>
+                    There are no two-factor authentication providers configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
+                    for details on setting up this ASP.NET application to support two-factor authentication.
+                </p>*@
+        @*@if (Model.TwoFactor)
+            {
+                using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                 {
-                    using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <text>Enabled
-                        <input type="submit" value="Disable" class="btn btn-link" />
-                        </text>
-                    }
+                    @Html.AntiForgeryToken()
+                    <text>Enabled
+                    <input type="submit" value="Disable" class="btn btn-link" />
+                    </text>
                 }
-                else
+            }
+            else
+            {
+                using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                 {
-                    using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <text>Disabled
-                        <input type="submit" value="Enable" class="btn btn-link" />
-                        </text>
-                    }
-                }*@
-        </dd>
+                    @Html.AntiForgeryToken()
+                    <text>Disabled
+                    <input type="submit" value="Enable" class="btn btn-link" />
+                    </text>
+                }
+            }*@
+        @*</dd>*@
     </dl>
+
+    @if (User.IsInRole("member"))
+    {
+        <h4>My Trips</h4>
+        <div class="row" id="my-trips">
+            <div class="col-lg-12"><p>Loading my trips...</p></div>
+        </div>
+    }
+
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryajax")
+
+    @if (User.IsInRole("member"))
+    {
+        <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                type: 'GET',
+                url: '/api/Participations?participantEmail=@User.Identity.Name',
+                success: function (result) {
+                    if (result.length > 0) {
+
+                        $("#my-trips").empty();
+                        //var elemsList = [];
+                        $.each(result, function (i, activity) {
+                            try {
+                                //console.log(activity.Name);
+                                var cardHtml =
+                                    `<div class="col-md-4" style="padding:1rem">
+                                            <div class="card">
+                                                <div class="card-img-top" style="height:170px">
+                                                    <img style="width:100%; max-height:170px" src="${activity.ImageUrl}" alt="${activity.Name}">
+                                                </div>
+                                                <div class="card-body">
+                                                    <h5>${activity.Name}</h5>
+                                                    <i>${moment(activity.ActivityDateTime).format("YYYY-MM-DD hh:mm A")}</i>
+                                                    <p style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">${activity.Description}</p>
+                                                    <p >${activity.Participations.length}/ ${activity.MaxParticipant} participants</p>
+                                                    <a href="/Activity/Details/${activity.ActivityID}" class="btn btn-primary">View details</a>
+                                                </div>
+                                            </div>
+                                        </div>`
+                                //elemsList.push(cardHtml);
+                                $("#my-trips").append(cardHtml);
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+
+                    } else {
+                        $("#my-trips").append(`<div class="col-lg-12"><p>No participated activities.</p></div>`);
+                    }
+                },
+            });
+        });
+
+        </script>
+    }
+
+}

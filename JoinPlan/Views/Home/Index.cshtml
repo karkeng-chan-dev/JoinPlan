@@ -1,31 +1,152 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
+@if (Request.IsAuthenticated)
+{
+    if (User.IsInRole("admin"))
+    {
+        @Html.ActionLink("Manage Site Content", "Index", "CMS")
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+        <hr />
+    }
+}
+<div class="jumbotron" id="lhb">
+    <h1>JoinPlan</h1>
+    <p class="lead" id="ht">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+    <p><a href="@Url.Action("Activities","Home")" class="btn btn-primary btn-lg">View all activities &raquo;</a></p>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
+<div class="text-center">
+    <h3>About us</h3>
+    <br />
+    <p id="abt"></p>
+    <br />
+    <p id="abjp"></p>
+    <br />
 </div>
+<hr />
+<div class="row d-flex justify-content-center">
+    <h3>Coming activities</h3>
+</div>
+
+<div class="row" id="future-activ-ls">
+    <div class="col-lg-12"><p>Loading activities...</p></div>
+</div>
+<div class="d-flex justify-content-center">
+    <a href="@Url.Action("Activities","Home")" class="btn btn-outline-primary">
+        View all activities
+    </a>
+</div>
+<br />
+<hr />
+<div class="text-center">
+    <h3>Contact Us</h3>
+    <br />
+    <div class="d-flex justify-content-center">
+        <a id="fb-link" href="" target="_blank">
+            <img src="~/Content/images/facebook.png" class="social-media-icon" style="margin-right:2.5rem" />
+        </a>
+        <a id="tw-link" href="" target="_blank">
+            <img src="~/Content/images/twitter.png" target="_blank" class="social-media-icon" style="margin-right:2.5rem" />
+        </a>
+        <a id="ig-link" href="" target="_blank">
+            <img src="~/Content/images/instagram.png" target="_blank" class="social-media-icon" style="margin-right:0" />
+        </a>
+    </div>
+    <br />
+    <a href="@Url.Action("Register", "Account")" class="btn btn-primary btn-lg">
+        Register Now
+    </a>
+    <br />
+</div>
+<br /> <br />
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryajax")
+
+    <script type="text/javascript">
+        $(function () {
+
+            $.ajax({
+                type: 'GET',
+                url: '/api/CMS1',
+                data: { futureDated: true },
+                success: function (result) {
+                    $.each(result, function (i, cmsData) {
+                        switch (cmsData.Name) {
+                            case 'LANDING_BANNER_BG':
+                                $('#lhb').css('background-image', 'url(' + cmsData.Value + ')');
+                                $('#lhb').css('color', 'white');
+                                $('#lhb').css('height', '370px');
+                                break;
+                            case 'LANDING_HEADER':
+                                $('#ht').html(cmsData.Value);
+                                break;
+                            case 'ABOUT_TEAM':
+                                $('#abt').html(cmsData.Value);
+                                break;
+                            case 'ABOUT_JP':
+                                $('#abjp').html(cmsData.Value);
+                                break;
+                            case 'FB_LINK':
+                                $('#fb-link').attr('href', cmsData.Value);
+                                break;
+                            case 'TW_LINK':
+                                $('#tw-link').attr('href', cmsData.Value);
+                                break;
+                            case 'IG_LINK':
+                                $('#ig-link').attr('href', cmsData.Value);
+                                break;
+                        }
+                    });
+                }
+            });
+
+            $.ajax({
+                type: 'GET',
+                url: '/api/Activities',
+                data: { futureDated: true },
+                success: function (result) {
+                    //console.log('Coming activities:');
+                    if (result.length > 0) {
+
+                        $("#future-activ-ls").empty();
+                        //var elemsList = [];
+                        $.each(result, function (i, activity) {
+                            try {
+                                //console.log(activity.Name);
+                                var cardHtml =
+                                    `<div class="col-md-4" style="padding:1rem">
+                                                                <div class="card">
+                                                                    <div class="card-img-top" style="height:170px">
+                                                                        <img style="width:100%; max-height:170px" src="${activity.ImageUrl}" alt="${activity.Name}">
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <h5>${activity.Name}</h5>
+                                                                        <i>${moment(activity.ActivityDateTime).format("YYYY-MM-DD hh:mm A")}</i>
+                                                                        <p style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">${activity.Description}</p>
+                                                                        <p >${activity.Participations.length}/ ${activity.MaxParticipant} participants</p>
+                                                                        <a href="/Activity/Details/${activity.ActivityID}" class="btn btn-primary">View details</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>`
+                                //elemsList.push(cardHtml);
+                                $("#future-activ-ls").append(cardHtml);
+                                $('#myDropdown').append(`<a href="/Activity/Details/${activity.ActivityID}">${activity.Name}</a>`)
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+
+                    } else {
+                        $("#future-activ-ls").append(`<div class="col-lg-12"><p>No future activities.</p></div>`);
+                    }
+                },
+            });
+        });
+
+    </script>
+
+}

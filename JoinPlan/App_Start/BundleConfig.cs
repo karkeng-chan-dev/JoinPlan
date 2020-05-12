@@ -14,17 +14,35 @@ namespace JoinPlan
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
+            bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
+                        "~/Scripts/jquery-ui.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/jqueryajax").Include(
+                        "~/Scripts/jquery.unobstructive-ajax*"));
+
+            bundles.Add(new ScriptBundle("~/bundles/moment").Include(
+                        "~/Scripts/moment*"));
+
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at https://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js"));
+                      "~/lib/bootstrap/dist/js/bootstrap*"));
+
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap-datetimepicker").Include(
+                      "~/Scripts/bootstrap-datetimepicker*"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
-                      "~/Content/site.css"));
+                      "~/lib/bootstrap/dist/css/bootstrap*",
+                      "~/Content/site.css",
+                      "~/Content/jquery-ui.css",
+                      "~/Content/jquert-ui.structure.css",
+                      "~/Content/font-awesome.css",
+                      "~/Content/jquert-ui.theme.css",
+                      "~/Content/bootstrap-datetimepicker.css"));
+
         }
     }
 }
