@@ -159,7 +159,6 @@ namespace JoinPlan.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    user.LastLogin = DateTime.Now;
                     await UserManager.UpdateAsync(user);
                     await UserManager.AddToRoleAsync(user.Id, "member" );
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);

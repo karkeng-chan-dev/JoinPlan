@@ -186,6 +186,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ParticipationsController.cs" />
+    <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DAL\JoinPlanContext.cs" />
     <Compile Include="DAL\JoinPlanInitializer.cs" />
     <Compile Include="Controllers\FeedbackController.cs" />

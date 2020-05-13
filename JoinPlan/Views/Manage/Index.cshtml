@@ -1,12 +1,9 @@
 ﻿@model JoinPlan.Models.IndexViewModel
 @{
-                /**/
-
-                ViewBag.Title = "My Profile";
+    ViewBag.Title = User.IsInRole("admin") ? "Admin User" : "My Profile";
 }
 
 <h2>@ViewBag.Title</h2>
-
 <p class="text-success">@ViewBag.StatusMessage</p>
 <div>
     <hr />
@@ -94,6 +91,24 @@
         </div>
     }
 
+    <br />
+
+    @if (User.IsInRole("admin"))
+    {
+        <h4>Member List</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Last Login</th>
+                    <th>
+                </tr>
+            </thead>
+            <tbody id="users-tb"></tbody>
+        </table>
+    }
+
 </div>
 
 @section Scripts {
@@ -144,8 +159,77 @@
                     }
                 },
             });
+
+            $.ajax({
+                type: 'GET',
+                url: '/api/Users',
+                success: function (result) {
+                    console.log(result);
+                    $("#users-tb").empty();
+                    $.each(result.users, function (i, user) {
+                        var row = `
+                            <tr>
+                                <th>${user.DisplayName}</th>
+                                <th>${user.Email}</th>
+                                <th>${user.LastLogin}</th>
+                            </tr>`
+                        $("#users-tb").append(row);
+                    });
+                },
+                error: function (err) {
+                    alert(eval(err));
+                }
+            });
         });
 
+        </script>
+    }
+    @if (User.IsInRole("admin"))
+    {
+        <script type="text/javascript">
+            $(function () {
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/Users',
+                    success: function (result) {
+                        console.log(result);
+                        $("#users-tb").empty();
+                        $.each(result.users, function (i, user) {
+                            var row = `
+                                        <tr>
+                                            <th>${user.DisplayName}</th>
+                                            <td>${user.Email}</td>
+                                            <td>${moment(user.LastLogin).fromNow()}</td>
+                                            <td>
+                                                <div style="cursor:pointer; color:red" onclick="deleteUser('${user.Email}')">
+                                                    <i class="fa fa-trash" ></i>
+                                                </div>
+                                            </td>
+                                        </tr>`
+                            $("#users-tb").append(row);
+                        });
+                    },
+                    error: function (err) {
+                        alert(eval(err));
+                    }
+                });
+            });
+        </script>
+
+        <script>
+            function deleteUser(email) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/Users?email=' + email,
+                    success: function (result) {
+                        if (result.success) {
+                            alert('Successfully removed user');
+                            setTimeout(function () { location.reload() }, 500);
+                        }
+                    }
+                })
+            }
         </script>
     }
 

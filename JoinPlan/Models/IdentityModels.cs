@@ -37,7 +37,7 @@ namespace JoinPlan.Models
             return userIdentity;
         }
         public string DisplayName { get; set; }
-        public DateTime LastLogin { get; set; }
+        public DateTime LastLogin { get; set; } = DateTime.Now;
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
